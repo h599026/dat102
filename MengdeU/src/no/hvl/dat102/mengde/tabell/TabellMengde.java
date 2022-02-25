@@ -8,6 +8,9 @@ import no.hvl.dat102.exception.EmptyCollectionException;
 import no.hvl.dat102.mengde.adt.MengdeADT;
 
 public class TabellMengde<T> implements MengdeADT<T> {
+	
+	
+	
 	// ADT-en Mengde implementert som tabell
 	//
 	private final static Random tilf = new Random();
@@ -124,15 +127,26 @@ public class TabellMengde<T> implements MengdeADT<T> {
 	}
 
 	@Override
-	public boolean equals(Object m2) {
-		//TODO
-		boolean likeMengder = true;
-		T element;
-
-		/*
-		 * ...
-		 */
-		return likeMengder;
+	public boolean equals(Object otherObject) {
+		// Other må implementerer MengdaADT
+		if(otherObject instanceof MengdeADT == false)
+			return false;
+		MengdeADT other = (MengdeADT) otherObject;
+		
+		// this og other må ha same lengde
+		if(antall == other.antall())
+			return false;
+		
+		// Alle elementa i this må innehaldes i other.
+		Iterator teller = iterator();
+		while(teller.hasNext()) {
+			if(other.inneholder(teller.next())) {
+				return false;
+			}
+		}
+		
+		// Alle krava består.
+		return true;
 	}
 
 	
@@ -140,56 +154,84 @@ public class TabellMengde<T> implements MengdeADT<T> {
 	/*
 	 * Denne versjonen av unionen er lite effektiv
 	 * 
-	 * @Override public MengdeADT<T> union(MengdeADT<T> m2) { TabellMengde<T> begge
-	 * = new TabellMengde<T>(); for (int i = 0; i < antall; i++) {
-	 * begge.leggTil(tab[i]); } Iterator<T> teller = m2.oppramser();
+	 * 	@Override 
+	 * 	public MengdeADT<T> union(MengdeADT<T> m2) {
+	 * 		TabellMengde<T> begge = new TabellMengde<T>();
+	 * 		for (int i = 0; i < antall; i++) {
+	 * 			begge.leggTil(tab[i]);
+	 * 		}
+	 * 		Iterator<T> teller = m2.oppramser();
 	 * 
-	 * while (teller.hasNext()) { begge.leggTil(teller.next()); } return
-	 * (MengdeADT<T>)begge; }
+	 * 		while (teller.hasNext()) {
+	 * 			begge.leggTil(teller.next());
+	 * 		}
+	 * 
+	 * 		return (MengdeADT<T>) begge;
+	 * 	}
 	 */
 	@Override
 
 	public MengdeADT<T> union(MengdeADT<T> m2) {
-		//TODO - Lage en mer effektiv kode
-		MengdeADT<T> begge = new TabellMengde<T>();
+		MengdeADT<T> begge = new TabellMengde<T>(antall + m2.antall()); // Sørgje for at det ikkje blir nødvendig å utvide tabellen
 		T element = null;
-		/*
-		 * ...
-		 * 
-		 */
+		Iterator<T> teller = iterator();
+		
+		while(teller.hasNext()) {
+			teller.next();
+			begge.leggTil(element);
+		}
+		
+		teller = m2.iterator();
+		while(teller.hasNext()) {
+			element = teller.next();
+			begge.leggTil(element);
+		}
+		
 		return begge;
 	}//
 
 	@Override
 	public MengdeADT<T> snitt(MengdeADT<T> m2) {
-		MengdeADT<T> snittM = new TabellMengde<T>();
-		T element = null;
-		/*
-		 * ...
-		 */
+		MengdeADT<T> snittM = new TabellMengde<T>(Math.max(antall, m2.antall()));
+		T element;
+		Iterator<T> teller = iterator();
+		while(teller.hasNext()) {
+			element = teller.next();
+			if(m2.inneholder(element));
+		}
+		
 		return snittM;
 	}
 
 	@Override
 	public MengdeADT<T> differens(MengdeADT<T> m2) {
-		//TODO
 		MengdeADT<T> differensM = new TabellMengde<T>();
 		T element;
-		/*
-		 * Fyll ut
-		 * 
-		 * if (!m2.inneholder(element)) ((TabellMengde<T>) differensM).settInn(element);
-		 */
+		Iterator<T> teller = iterator();
+		
+		while(teller.hasNext()) {
+			element = teller.next();
+			if(m2.inneholder(element) == false) {
+				differensM.leggTil(element);
+			}
+		}
 
 		return differensM;
+		
 	}
 
 	@Override
 	public boolean undermengde(MengdeADT<T> m2) {
-		//TODO
-		boolean erUnderMengde = true;
-		// ...
-		return false;
+		// Alle element i this må inneholdes i m2
+		Iterator<T> teller = iterator();
+		while(teller.hasNext()) {
+			if(m2.inneholder(teller.next()) == false) {
+				return false;
+			}
+		}
+
+		// Alle krava består.
+		return true;
 	}
 
 	@Override
@@ -205,6 +247,14 @@ public class TabellMengde<T> implements MengdeADT<T> {
 		antall++;
 	}
 
-	
+	public String toString() {
+		String resultat = "";
+		Iterator<T> teller = iterator();
+		while(teller.hasNext()) {
+			resultat += teller.next().toString() + "\t";
+		}
+		
+		return resultat;
+	}
 
 }// class
